@@ -1,0 +1,1015 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\title{Replicación de índice con un portafolio de inversión utilizando clustering y programación Entera}
+\author{Práxedis Jiménez Ruvalcaba}
+\date{26 de mayo de 2025}
+
+\begin{document}
+\title{Replicación de índice con un portafolio de inversión utilizando clustering y programación Entera}
+\author{Práxedis Jiménez Ruvalcaba}
+\date{26 de mayo de 2025}
+\textbf{Replicación de índice con un portafolio de inversión utilizando clustering y programación Entera}
+
+Asesor: Beatriz Alejandra García Ramos
+
+Práxedis Jiménez Ruvalcaba
+
+\textbf{Introducción}
+
+Lo que se busca lograr es un fondo indexado a través del
+\emph{quantitative portfolio management} y, en particular, del uso de la
+clusterización y la programación entera mixta para así conseguir
+maximizar las ganancias y reducir los riesgos de este. En general se
+busca adaptar el trabajo de Gharanchaei y Panda (2024)\footnote{Gharanchaei, M. K., Panda, P. P. (2024). \emph{Constructing and investment fund thourg stock clustering and integer programming}.Journal of Advancements in Applied Business Research.}, adaptado al
+contexto particular de México.
+
+No se busca un trabajo enfocado meramente a la inversión, sino que uno a través de la \emph{modern portfolio theory} ,en particular, el
+trabajo realizado por Markowitz (1952)\footnote{Markowitz, H. (1952). \emph{Portfolio selection}. JSTOR. (pp 77- 91).}, y el marco en el que se constituye,
+podamos realizar comparaciones y un análisis que nos permita un mayor
+entendimiento de nuestra economía y la naturaleza de nuestro mercado
+local. Lo cual, a su vez, nos puede facilitar comprender ciertos
+eventos y condiciones históricas.
+
+Es común hallar trabajos que toman datos de países alejados de la
+realidad del nuestro, por lo que sus resultados también llegan a distar
+de nuestro contexto. Esto nos incita a pensar que existe un valor en
+adaptar otros trabajos para ver si son aplicables a nuestra realidad y
+, si no, ampliar su obra en otros contextos.
+
+\textbf{Revisión de literatura}
+
+Con \emph{quantitative portfolio mangment}, nos referimos al uso de
+herramientas de la matemática para optimizar la gestión de activos.
+Siendo que este problema radica en dos; uno de clasificación (qué
+activos considerar) y uno de optimización (cuánto de cada uno). Se
+utilizarán dos herramientas, que son el \emph{clustering} y la programación
+entera mixta.
+
+Esta clase de herramientas ya han sido usado para este mismo tipo de
+problemas, por ejemplo, en problemas como \emph{set covering} de Wolsey
+(1998)\footnote{Wolsey Laurence, A. (1998). Formulations. \emph{Integer Programming}.(pp. 1-18). Wiley Interscience.}. Se utilizan conceptos de \emph{clustering} (al clasificar
+conjuntos), en un problema de programación entera, solo que en este caso
+siendo algo para minimizar costos.
+
+De forma más específica, también ya se ha trabajado con optimizar
+portafolios de inversión para máxima liquidez utilizando programación
+entera mixta como en Bertsimas \emph{et al.} (1998)\footnote{Bertsimas, D., Darnell, C., Soucy, R., (1998). \emph{Portfolio construction through mixed integer programming}. MIT.}. Incluso ha habido
+formas más recientes de trabajar con estas ideas utilizando herramientas
+actuales como lo son optimizadores, por ejemplo, Gurobi Optimizer en
+Kuhn (2023)\footnote{Kuhn, C. C. N., Calbert, G., Garanovich, I. L., Weir, T., (2023). \emph{Integer linear programming supporting portfolio design.} Elsevier}. Aunque en este caso era un problema con un enfoque
+distinto al tener que ver más con administración gubernamental donde el enfásis radica en reducir riesgos, lo cual es muy distinto al usual querer maximizar ganacias.
+
+Sin embargo, el trabajo que más servirá y más se cita como referencia
+para esta clase de problemas en la literatura rescatada es sin duda
+alguna, el trabajo de Markowitz (1952) de nombre \emph{mean-variance}
+es hoy mejor conocido como \emph{modern portfolio theory}. Donde
+describe y propone distintos modelos según ciertas propiedades, con el
+objetivo de obtener los mayores retornos con los menores riesgos. En
+particular describe tanto el \emph{equally weighted,} por capitalización
+de mercado y de volatilidad mínima, además de la forma general de
+optimizar.
+
+Un fondo indexado, como lo indica su nombre, es un índice que monitorea
+y mide los rendimientos de un conjunto particular de activos. Que en
+este caso sería el índice de precios y cotización de la bolsa mexicana
+de valores, que mide los rendimientos de 35 de las empresas más
+importantes de México utilizando como métrica la capitalización de
+mercado. La idea es tener un fondo con el que comprar activos imitando
+los rendimientos de un índice que mide un mercado en particular. La cual
+es una práctica común en casas de bolsa o fondos de inversión común.
+
+La idea de realizar el trabajo con un fondo indexado en mente es que
+estos son muy diversos y que se construyen en base a una estrategia
+concreta, es decir, se elige un primer enfoque y el resto de las
+decisiones son una consecuencia de esta primera estrategia seleccionada.
+O, dicho de otra forma, es un enfoque pasivo. Lo cual dista de otros
+tipos de portafolios donde se requiere estar tomando decisiones de forma
+activa.
+
+Existen trabajos que prueban una correlación entre maximizar las
+ganancias y minimizar los riesgos como Anderson \emph{et al.} (2011)\footnote{Anderson, R. M., Bianachi, S. W., Goldberg, L. R. (2011). \emph{Will My Risk Parity Strategy Outperform?} Berkeley.} y Baker \emph{et al}. (2011)\footnote{Baker, M., Bradley, B., Wurgler, J\emph{. Benchmarks as Limits to Arbitrage: Understanding the Low-Volatility Anomaly}. Financial Analysts Journal.}, de forma que al realizar uno de los
+objetivos, implícitamente estás maximizando riesgos o minimizando
+ganancias. Dichos trabajos remarcan que existe evidencia para creer que
+mientras se minimicen los riegos un efecto es la reducción de las
+ganancias.
+
+Como ninguno de los enfoques sobre si maximizar ganancias afecta a los
+riesgos parece tener evidencia para descartar al otro. Además de que en
+los resultados de estos trabajos y nuestras referencias principales;
+Gharanchaei y Panda (2024), Markowitz (1952), muestran que maximizar
+ganancias minimiza el riesgo en cierta medida, pero esto se puede
+optimizar. Tendremos esta visión a la hora de trabajar con el problema.
+
+El tomar la correlación como métrica para la clusterización tiene un
+fundamento teórico en economía, pues acorde a Koumou (2020)\footnote{Koumou, G. B.(2020) \emph{Diversification and portfolio theory: a review}. Swiss Society for Financial Market Research.}, una de las
+maneras de diseñar la correcta diversificación de un portafolio es
+agrupando a los activos con una correlación cercana a 1 y separando al
+resto. Esto reduce las probabilidades de que distintas agrupaciones
+tengan un mal desempeño al mismo tiempo, a esto se le conoce como
+\emph{multilateral insurance}.
+
+Tomamos la diversificación como algo bueno ya que, si bien Choueifaty y
+Coignard (2008) \footnote{Choueifaty, Y., Coignard, Y. (2008). \emph{Toward Maximum Diversification}. The Journal of Portfolio Management.} muestran que existen diversos enfoques donde puede ser
+una estrategia no óptima, también se dan argumentos contrarios y que es
+más prominente las posibles ventajas que las desventajas. Además de que
+se remarca que los modelos no necesariamente reflejan la realidad del
+mercado, aunque puedan llegar a interpretarlo apropiadamente, y el éxito
+que pueda tener un modelo no debe de ser el único criterio para
+trasponerlo en el mundo real.
+
+En nuestro caso, al estar imitando un índice, lo que buscamos es
+precisamente un modelo que refleja la realidad de un mercado y economía
+específicos. Esto por el interés de que todas las consideraciones en los
+trabajos citados son en un mercado competitivo y diverso, siendo esto
+algo distinto a la realidad del mercado mexicano el cual es monopólico y
+poco diverso. (Reed \emph{et al,} 2023)\footnote{Reed, T; Muñoz Moreno, R. (febrero 23, 2023). \emph{How the Federal Economic Competition Commission fights for workers and consumers in Mexico}. World Bank.}.
+
+Choueifaty y Coignard (2008) enfatizan que no hay una sola medición que
+sirva para determinar la optimalidad de un modelo y es por ello por lo
+que todo trabajo de índole bursátil, debe de contar con al menos dos
+enfoques distintos. Por ejemplo, existen argumentos válidos que
+favorecen a la varianza entre activos como una medida, pero también los
+hay que dicen que el interés compuesto es una mejor forma de determinar
+qué tan bien funciona el modelo.
+
+En nuestro caso estaremos tomando el enfoque de las estrategias
+\emph{equally weighted} ya que por Chow \emph{et al.} (2011)\footnote{ Chow, T., Hsu, J., Kalesnik, V., Little, B., \emph{A Survey of Alternative Equity Index Strategies}. Financial Analysts Journal.}, y Carvalho \emph{et al.} (2012) \footnote{  Carvalho R. L., Lu, X., Moulin, P. (2012).\emph{Demystifying Equity Risk-Based Strategies: A Simple Alpha plus Beta Description}. The Journal of Portfolio Management.}, entendemos que, si bien se trata de una estrategia
+que antepone minimizar el riesgo a las ganancias, sigue siendo óptima
+además de que puede ser adaptada para asemejarse a otros tipos de
+estrategias que buscan diversificar, las cuales pueden llegar a ser más
+eficiente pero solo cuando se trata de reducir los costos, especialmente
+durante la inversión inicial.
+
+A estas estrategias se les llama también \emph{risk parity assest
+allocation} (Choueifaty y Coignard, 2008), que nuevamente es distribuir
+los ``pesos'' para repartir el riesgo de manera equitativa. Siendo que
+el riesgo tiende a estar medido en volatilidad. Donde la volatilidad
+puede entenderse como qué tanto sube y baja de precio, por lo que
+podemos medirla como desviación estándar de los precios de una acción en
+un cierto período de tiempo.
+
+Baker \emph{et al.} (2011), muestra que existen otras formas de medir la
+volatilidad dependiendo del tipo de activo y las consideraciones que se
+busquen tener, pero no es que exista una mejor forma que otra, sino que
+depende del contexto, aunque las formas más básicas tienden siempre a
+dar un acercamiento bastante acertado y por ello tomaremos la
+volatilidad como la desviación estándar de los precios de cierre en el
+período del tiempo de reajuste de los portafolios.
+
+En ese mismo trabajo también se concluye que los portafolios
+diversificados son óptimos en comparación del resto, aun considerando un
+horizonte de tiempo real y distintas métricas. Koumou. (2020), Da
+argumentos a favor y en contra de la diversificación, pero su conclusión
+es también que la diversificación es una estrategia óptima. Por ello
+este es el enfoque en el que estamos abordando el problema.
+
+Otra métrica que utilizaremos es la de la capitalización de mercado, la
+cual son las acciones en circulación de una empresa particular
+multiplicada por el valor que tienen dichas acciones de forma individual
+en dicho momento. Entonces la capitalización de mercado no es más que el
+valor total de las acciones de circulación.
+
+La capitalización de mercado es una métrica muy usada porque te habla
+sobre la presencia que una empresa tiene en un mercado, entre más alta
+sea, más presencia tiene. A su vez, las fluctuaciones que pueda tener en
+un cierto tiempo te hablan también sobre la volatilidad que dicha
+empresa. Ambas lecturas dan información tanto de si una empresa es
+representativa de un sector como del riesgo que pueda significar
+invertir en esta, por lo tanto, es de interés para nosotros además de
+que el índice que estamos intentando replicar esta medido con esta
+métrica.
+
+El algoritmo que se quiere usar para el clustering es el de
+\emph{partitioning around medoids}, Botyarov y Miller (2022)\footnote{Botyarov, M., Miller, E. E., \emph{Partitioning around medoids as a systemic approach to generative design solution space reduction.} Elsevier.}; el cuál es
+semejante a \emph{K-means} por tener una cantidad fija de centroides,
+pero sin usar la media aritmética y distancias euclidianas para
+relacionar a los elementos a un centroide, sino que, usando cualquiera
+otra métrica para medir la semejanza de los elementos con el centroide,
+que en este caso será la correlación.
+
+En algunos trabajos los activos ya son un conjunto de otros activos que
+poseen una alta similitud entre sí, esto es solo para hacer más sencillo
+el seguimiento del desempeño de los activos, por el trabajo que se debe
+hacer de estar constantemente monitoreando y analizando los desempeños
+de estos activos, por lo que cada activo asignado a un clúster es
+representativo de otro. Bajo esta misma lógica es que la cantidad de
+centroides se elige notablemente menor a la de activos totales
+(Gharanchaei y Panda, 2024).
+
+\textbf{Descripción del problema.}
+
+Hay dos enfoques con los que abordar el problema de replicar un índice;
+heurísticas y optimización. Las heurísticas es con las 3 fórmulas que
+serán mencionados a continuación del modelo para el clustering, pero se
+consiguen con base a la teoría y utilizan el concepto de
+\emph{multilateral insurance,} así como las métricas de la
+capitalización de mercado y la volatilidad.
+
+Mientras que el enfoque por optimización consiste en utilizar el trabajo
+de Markowitz (1952), y usar sus algoritmos para mínima varianza y
+máxima ganancia, pero en una forma matricial y aprovechando los ya
+resultados proporcionados por las heurísticas, que en este caso nos
+estaremos refiriendo como \emph{benchmarks}, las cuales serán las
+optimizadas.
+
+El índice que intentaremos replicar con lo antes mencionado y
+posteriormente descrito es el S\&P índice de precios y cotizaciones de
+la bolsa mexicana de valores (S\&P IPC BMV), comúnmente abreviado como
+IPC.
+
+Tomamos este índice ya que es uno de los principales indicadores de la
+economía mexicana, pues su comportamiento ha descrito apropiadamente el
+de nuestra economía y es una buena muestra de los principales sectores
+económicos de nuestro país. De mayor a menor proporción en el IPC se
+encuentran los sectores de servicio de telecomunicaciones, consumo
+frecuente, materiales, servicios financieros, industrial, servicio y
+bienes de consumo no básicos y salud.
+
+El IPC es elaborado por la compañía S\&P Dow Jones, la cual está
+enfocada en realizar índices de mercado. En este caso el IPC se elabora
+utilizando como métrica la capitalización de mercado de 35 empresas
+mexicanas S\&P Down Jones (2025)\footnote{S\&P Dow Jones Indices. (31 marzo 2025). S\&P BMV IPC: \emph{Constituents Export}. {[}Base de datos{]}.}, las cuales
+son:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule()
+\multicolumn{2}{@{}>{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{1.0000} + 2\tabcolsep}@{}}{%
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Empresas mexicanas parte del IPC}
+\end{minipage}} \\
+\midrule()
+\endhead
+Alfa S.A. A & Grupo Bimbo S.A.B. \\
+Alsea S.A. & Grupo Carso S.A.B. de C.V. \\
+América Móvil S.A.B. de C.V. B & Grupo Cementos de Chihuahua S.A.B. de
+C.V. \\
+Arca Continental S.A.B. de C.V. & Grupo Comercial Chedraui S.A. de
+C.V. \\
+Banco del Bajío S.A. & Grupo Financiero Banorte O. \\
+Becle S.A. De C.V. & Grupo Financiero Inbursa O \\
+Bolsa Mexicana de Valores S.A. de C.V. & Grupo México S.A.B. de C.V.
+B \\
+Cemex S.A. CPO & Grupo Televisa S.A.B. CPO \\
+Coca Cola Femsa S.A.B. de C.V. UBL & Industrias Peñoles \\
+Corporación Inmobiliaria Vesta S.A.B. de C.V. & Kimberly Clark de México
+S.A.B. de C.V. A \\
+El Puerto de Liverpool S.A.B. de C.V. & La Comer S.A.B. de C.V. UBC \\
+Fomento Económico Mexicano S.A.B. de C.V. & Megacable Holdings S.A.B. de
+C.V. \\
+Genomma Lab Internacional S.A. de C.V. & Orbia Advance Corporation
+S.A.B. de C.V. \\
+Gentera S.A.B. de C.V. & Promotora y Operadora de Infraestructura SAB de
+CV \\
+Gruma S.A.B. B & Qualitas Controladora S.A.B. de C.V. \\
+Grupo Aeroportuario del Centro Norte S.A.B. de C.V. & Regional S.A. de
+C.V. \\
+Grupo Aeroportuario del Pacifico, S.A.B. de C.V. & Walmart de México
+S.A.B. de C.V. \\
+Grupo Aeroportuario del Sureste S.A.B. de C.V. B & \\
+\bottomrule()
+\caption{Listado de empresas que conforman el IPC\&P BMV, acorde a la información obtenida proporcionada por los elaboradores del ínidce S\&P Down Jones.}
+\end{longtable}
+
+Utilizando las librerías ``yfinance'' e ``invest-corepy'' en Visual
+Basic 1.99.3 con Python 3.12.7 integrado en el paquete de anaconda de
+versión 2.6.5, se obtuvieron los datos históricos desde Yahoo Finance de los precios máximos, mínimos y
+de cierre, además de la cantidad en circulación de las acciones de las
+35 empresas durante los períodos 2008 a 2010 y 2015 a 2024.
+
+Se tomaron estas fechas ya que se desea probar cómo funcionan los
+distintos enfoques previamente mencionados en un período de diez años,
+específicamente el de 2015 a 2024 ya que en 2010 se cambiaron algunas
+consideraciones al momento de medir el IPC, así que esas fechas poseen
+una metodología consistente de mediciones en el índice, además de que
+son fechas con crecimiento económico moderado, una recesión en 2020 y
+una recuperación en 2021 (Banco de México, 2025) \footnote{Banco de México. (2025). Sistema de Información Económica {[}Base de datos{]}.}. 
+
+Podemos decir que estamos tomando un período nada despreciable para
+estudiar, dado que todo tipo de evento en la economía tomó lugar en este
+período y en particular para realizar un contraste con Garchaei y Panda
+(2024), donde se toma el período 2014 a 2023.
+
+Además, sería ideal probar los modelos en el período de 2008 a 2010,
+para ver cómo contrasta con una recesión mucho mayor a la del 2020 y
+verificar qué tan robusto es el modelo. En la literatura se ha visto una
+práctica común y útil el probar modelos durante las crisis de 1929 y
+2008, puesto que han sido de las más graves para Estados Unidos y ser
+capaz de tener poco error entonces indica una buena robustez para
+modelos o una buena certidumbre conforme la teoría que se esté probando.
+
+La fecha particular de 2008 no es solo porque se haga en trabajos
+enfocados a Estados Unidos, sino que, en el caso de la economía
+mexicana, hemos padecido de 5 recesiones importantes posteriores a la
+guerra cristera de 1926; la de 1980, 1994, 2000, 2008 y 2020. Pero
+tomamos 2008 porque es donde las condiciones de mercado son más
+similares a las actuales y no hay que ampliar mucho en el marco del contexto
+histórico a la hora de realizar un análisis.
+
+Cabe destacar que para 2008, los datos de Banco del Bajío S.A., Becle
+S.A. de C.V., Coca Cola Femsa S.A.B. de C.V. UBL, La Comer S.A.B. de
+C.V. UBC, Qualitas Controladora S.A.B. de C.V. y Regional S.A. de C.V.,
+están incompletos y no fue posible completarlos.
+
+Los portafolios, excepto el del clustering y el \emph{equally weighted}
+que por su naturaleza son fijos, van a estarse reajustando cada 6 meses.
+Lo ideal es tener distintos períodos para reajustarse, pero tomamos los
+6 meses porque es la misma cantidad de tiempo en la que IPC se
+requilibra, entonces así tenemos una cierta consistencia entre nuestro
+portafolio y aquello que queremos imitar.
+
+Los reajustes semestrales para la primera mitad serán partiendo del 30 de
+junio para los años 2015, 2016, 2017, 2020, 2021, 2022 y 2023. Del 28 de
+junio de para 2019 y 2024. Y del 29 de junio para 2018. Mientras que para la
+segunda son el 31 para los años 2015, 2018, 2019, 2020 y 2021. 30 de
+diciembre para 2016, 2022, 2024. Y 29 de diciembre para 2017 y 2023.
+
+La primera parte del problema es obtener las correlaciones lineales
+entre acciones, puesto que será la métrica que usaremos para nuestra
+clusterización usando \emph{partiotoning around medoids}. Esto nos
+indicará cuáles son las acciones más representativas de cada clúster.
+
+Seleccionamos la cantidad de 2, 4 y 8 clústers para realizar el
+\emph{partitioning around medoids}, con base a proporciones acorde al
+trabajo de Gharanchaei y Panda (2024), ya que su trabajo considera 84
+series de acciones y 5, 10 y 20 clústeres. Como nosotros consideramos
+solo 35 series de acciones, entonces estimamos las proporciones y así
+establecimos las cantidades de clústeres con las cuales trabajar el
+problema.
+
+La manera en que queremos optimizar la culsterización es con uso de
+programación entera mixta, pues (Gharanchaei y Panda., 2024)
+describe un modelo con el cual contamos con variables enteras, pero
+nuestra función objetivo maximiza un número real el cual es la suma de
+las correlaciones de los elementos de los activos con su respectivo
+centroide.
+
+\begin{equation}
+\max\sum_{i = 1}^{n}{\sum_{j = 1}^{n}{c_{ij}x_{ij}}} \tag{1}
+\end{equation}
+Sujeto a:
+
+\begin{equation}
+\sum_{j = 1}^{n}{y_{j} = k} \tag{1.2}
+\end{equation}
+\begin{equation}
+\sum_{j = 1}^{n}{x_{ij} = 1\ \forall i} \tag{1.3} 
+\end{equation}
+\begin{equation}
+x_{ij} \leq y_{j}\ \forall i,j \tag{1.4}
+\end{equation}
+\begin{equation}
+x_{ij},y_{j}\epsilon\left\{ 0,1 \right\} \tag{1.5}
+\end{equation}
+
+
+Donde las variables toman sus valores acordes a lo descrito en la
+siguiente tabla:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2195}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7805}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\[c_{ij}\]
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Similitud entre activo i y j. Es la correlación que existe entre ambos
+activos. Es un valor entre -1 y 1.
+\end{minipage} \\
+\midrule()
+\endhead
+\(x_{ij}\) & Indica si el activo j del portafolio posee una alta
+correlación positiva al activo i. Toma el valor de 1 si este es el caso
+y toma 0 de lo contrario. \\
+\midrule()
+\(y_{j}\) & Denota qué activo j se encuentra en el portafolio tomando el
+valor de 1, de lo contrario es 0. \\
+\midrule()
+\emph{k} & La cantidad de centroides, el cual como ya se explicó, debe
+de ser un número más chico que el total de activos porque se trabajará
+con representantes de la clase. \\
+\bottomrule()
+\caption{Descripción de las variables utilizadas para realizar el \textit{clustering} de \textit{k-medoids} para obtener activos representativos.}
+\end{longtable}
+
+Ya tomando solo las acciones representativas, tenemos con qué medir el
+error, puesto que es como tomar los principales componentes el IPC. Y
+ahora podemos trabajar con el enfoque para resolver el problema a través
+de \emph{benchmarks}, ya anteriormente mencionados en la revisión de
+literatura y que tomamos de Carvalho \emph{at al.} (2012). Aunque son
+también mencionados por Markowitz (1952).
+
+La ecuación (1) maximiza el producto de la correlación lineal, para así poder seleccionar aquellos que posean mayor correlación con el resto y que sean una muestra representativa. La restricción (1.2) nos garantiza que se asignen los mismos activos que centroides. Mientras que las restricciones (1.3) y (1.4) son para evitar que se puedan repetir la selección de ciertos activos, que al trabajar con una matriz cuadrada puede que se seleccionen el mismo \emph{x} \emph{i,j} y el \emph{j,i} al mismo tiempo, lo cual no sería una solución real. (1.5) solo establece la naturaleza de las variables como binarias.
+
+Para mantener una consistencia con entre los \emph{benchmarks} y el
+enfoque por optimización del trabajo de Markowitz (1952), donde se
+destaca el considerar el problema sin tomar en cuenta la participación o
+las posibles decisiones que un asesor, corredor de bolsa o la
+experiencia y criterio que alguien pueda aportar, especialmente en
+cuestión probabilística, lo descartaremos. Solo tomaremos en cuenta los
+resultados directos.
+
+Lo primero que haremos será un portafolio de tipo \emph{equally
+weighted.} El cual es simplemente darle el mismo peso a todas las
+acciones para poder tener resultados consistentes con lo anteriormente
+planteado y poder contrastar resultados, tomaremos 3 de estos modelos,
+empezando por el más general y mencionado:
+
+Si tienes \emph{n} activos
+\begin{equation}
+ w_{i} = \frac{1}{n} \tag{2}   
+\end{equation}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2082}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7918}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\[w_{i}\]
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Peso del activo \emph{i}, es decir, su importancia y cuánto debe de
+invertírsele en comparación del resto
+\end{minipage} \\
+\midrule()
+\endhead
+\(n\) & Total de activos \\
+\bottomrule()
+\caption{Descricpión de variables para realizar el \textit{benchmark equally weighted.}}
+\end{longtable}
+
+Este enfoque consigue una diversificación tal que maximiza la
+rentabilidad de la inversión con relación al riesgo que poseen los
+activos que se asumen. Simplemente es otorgarles el mismo peso o
+prioridad a todos los activos, que por la anteriormente
+\emph{multilateral insurance}, termina por proporcionar un riesgo mínimo
+sin condicionar la ganancia máxima.
+
+\emph{Equally Wighted} es el \emph{benchmark} más noble. Es simple de
+describir, operar, no requiere estarlo requilibrando en ningún momento.
+Y el no desplomar la ganancia a costa de reducir el riesgo, además de
+servir en cualquier mercado y ser fácilmente adaptable; lo ha vuelto una
+estrategia vencedora difícil de superar.
+
+El otro modelo sería el del \emph{market-cap}, el cual asocia cada
+activo acorde a su capitalización del mercado, el cual es el producto de
+acciones en circulación y su precio actual.
+
+\begin{equation}
+w_{i} = \frac{M_{i}}{\sum_{j}^{n}M_{j}}   \tag{3}
+\end{equation}
+
+Donde
+
+\begin{equation}
+ M_{i} = x_{i}p_{i} \tag{4}   
+\end{equation}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1601}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8399}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\[M_{i}\]
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Capitalización del mercado de la compañía \emph{i.} Puede entenderse
+como una métrica con la cual evaluar la viabilidad de invertir en una
+compañía. Cocientando esta medida con la suma de todas podríamos saber
+cuál es la proporción con la que debemos invertir en cada compañía.
+\end{minipage} \\
+\midrule()
+\endhead
+\(x_{i}\) & Cantidad de acciones circulando en el mercado de la compañía
+\emph{i} \\
+\midrule()
+\(p_{i}\) & Precio actual de las acciones de la compañía \emph{i} \\
+\bottomrule()
+\caption{Descricpión de variables del \textit{benchmark} de la capitalización de mercado.}
+\end{longtable}
+
+Esta es la estrategia de este tipo de enfoque que menos genera. Es en
+cierta forma muy segura y cambia muy poco, pues al generar poco, uno
+tarda en reinvertir los dividendos generados por la inversión anterior.
+
+Lo que plantea el \emph{benchmark} es invertir proporcionalmente a la
+capitalización de mercado, entre más alta sea, más habrá que invertir.
+Ya que esto asegura estar invirtiendo acorde a las propias proporciones
+del mercado y así tomar solo acciones representativas por lo que reduces
+el riesgo. Tener activos en las empresas más grandes de cada sector es
+considerado como una estrategia a veces excesivamente segura, de ahí
+viene su usual poca ganancia, pero gran reducción de riesgo.
+
+Al momento de medir la capitalización de mercado los datos que tenemos
+son las acciones en circulación en un cierto momento. No disponemos de
+la información necesaria para saber si algunas de esas acciones son
+\emph{inside trading,} es decir, al intercambio privado entre
+accionistas o miembros de la compañía de acciones\emph{.} Por lo que
+consideraremos que todo lo que está en circulación es abierto para todo
+el público o todo el mercado accionario al menos.
+
+La ecuación (3) parte de distribuir los pesos directamente proporcional a la capitalización de mercado. Entre mayor sea su capitalización de mercado, mayor peso. Esto ya que entre más activos en circulación haya de un activo, hay menos probabilidades de que lo vendan o lo compren todo, además de que como es multiplicado por el valor del activo, te aseguras de que las acciones posean una cierta demanda y no vayan a perder su precio fácil al haber muchos en circulación. El único problema que tiene es si el volumen es tan grande o si el precio es tan grande que el resto de componentes dejen de importar, pero esto es inusual en una economía competitiva.
+
+El último enfoque del tipo de diversificación que estamos trabajando y
+usaremos es el que se basa en la volatilidad como métrica. Reiterando
+algo mencionado previamente, en este caso mediremos la volatilidad con
+la desviación estándar de los precios de un activo. El modelo en
+cuestión es:
+
+\begin{equation}
+w_{i} = \frac{\frac{1}{\sigma_{i}}}{\sum_{j}^{n}\frac{1}{\sigma_{j}}}   \tag{5}  
+\end{equation}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1440}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8560}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\[\sigma_{i}\]
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Volatilidad del activo \emph{i}. La desviación estándar de su precio.
+\end{minipage} \\
+\endhead
+\bottomrule()
+\caption{Descripción de las variables del \textit{benchmark} de la volatilidad.}
+\end{longtable}
+
+Se trata de un caso particular puesto que, en condiciones concretas,
+llega a ser de lejos el más eficiente de los tres modelos, pero en general
+se trata de un enfoque centrado en favorecer los activos de bajo riesgo,
+pero teniendo rendimientos más similares al primer modelo y de hecho
+siendo a veces muy similar a este.
+
+La manera en que funciona es simplemente con proporciones, como queda indicado en (5). El activo con
+mayor riesgo es el que menos peso deba tener en el fondo indexado,
+mientras que el de menor riesgo va a tener el mayor peso. Esto nos da
+una certidumbre al momento de minimizar el riesgo, pero lo consigue
+llegando a reducir considerablemente las ganancias.
+
+Para asignar el peso acorde a la capitalización de mercado de los
+clústeres, tenemos la fórmula:
+
+\begin{equation}
+ x_{jl} = \frac{\sum_{i \in C_{l}}^{}V_{i}}{\sum_{I = 1}^{n}V_{i}},\ \ l = 1,\ldots,\ k  \tag{6} 
+\end{equation}
+
+Donde \emph{k} es el total de los clústeres
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\[V_{i}\]
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Capitalización de mercado de la acción i
+\end{minipage} \\
+\midrule()
+\endhead
+\(C_{i}\) & Clúster i \\
+\midrule()
+\emph{l} & Cantidad de clústeres \\
+\midrule()
+\(x_{jl}\) & Peso de la acción j en el clúster l \\
+\bottomrule()
+\caption{Descripción de variables para asignar pesos optimizados según los activos representativos de la clusterización y la capitalización de mercado.}
+\end{longtable}
+
+Lo que se realiza aquí es determinar la proporción que cada acción
+debería de tener en cada uno de los clústeres que se determinaron al
+inicio, acorde a la capitalización de mercado. Por eso es la
+capitalización de mercado de un cierto clúster, entre la del total de
+clústeres.
+
+ Las ecuaciones (2), (3), (4) y (5), no se obtienen de manera experimental, sino que se determinan por planteamiento teórico. A través de la propia teoría de la economía se determinan estas ecuaciones. Uno puede fijarse en que simplemente son determinar una proporción acorde a una cierte métrica del rendimiento de un activo, en estos casos con el objetivo de minimizar el riesgo. Ya sea repartiendo con la seguridad que da el mercado competitivo con la capitalización de mercado, la seguridad que da darle menos peso a lo que tiene más riesgo con la volatilidad, o la \emph{multilateral isnurance} con la repartición uniforme de pesos.
+
+Cabe resaltar que el uso de la capitalización de mercado como factor de
+decisión para determinar las proporciones es porque es la métrica con la
+que se elabora el índice que deseamos imitar. El IPC es elaborado con la
+capitalización de mercado por lo que usar estás métricas durante el
+proceso de optimización es en parte para mantener una consistencia y
+esperando conseguir un mejor resultado, además de que nos permitirá
+realizar ciertos análisis de forma sencilla, sin tener que estar tomando
+a consideración equivalencias y nuevamente, aprovechar una cierta
+consistencia.
+
+Este proceso de clusterización debe de realizarse para poder trabajar
+apropiadamente con el siguiente modelo de optimización, el cuál debería
+de optimizar la varianza en base a la ganancia máxima obtenida en los
+anteriores modelos. Se usará el siguiente modelo para cada uno de los tres
+\emph{benchmarks} anteriormente planteados.
+
+Estos serían los tres modelos que tomaríamos como referencia para
+nuestros índices y ver cómo se comporta la clusterización realizada en
+base a la correlación. Para optimizar los portafolios anteriormente
+realizados con los \emph{benchmarks} tomaríamos como referencia el
+siguiente modelo planteado por Choueifaty y Coignard (2008):
+
+\begin{equation}
+\min{\left( X - X_{B} \right)^{T}M(X - X_{B}}) \tag{7}  
+\end{equation}
+
+Sujeto a:
+
+\begin{equation}
+1^{T}X = 1 \tag{7.2}    
+\end{equation}
+\begin{equation}
+X \geq 0 \tag{7.3}    
+\end{equation}
+\begin{equation}
+\left| x_{t} - x_{t - 1} \right| < cota\ de\ ganancia\ máxima \tag{7.4}
+\end{equation}
+\begin{equation}
+\sum_{i = 1}^{n}{\left| x_{i - 1} - x_{i} \right| \leq t\ para\ t\ que\ es\ un\ "treshold"}   \tag{7.5}
+\end{equation}
+\begin{equation}
+x_{i}\epsilon\left\{ 0,1 \right\}\ para\ i = 1,\ldots,n    
+\end{equation}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1601}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8399}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\emph{X}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Es un vector con las acciones del portafolio creado con clustering donde
+\(x_{i}\) es el activo \emph{i.}
+\end{minipage} \\
+\midrule()
+\endhead
+\(X_{b}\) & Es un vector con los pesos asignados a un portafolio de los
+creados con los modelos donde \(x_{b}\) es el activo \emph{b} que
+corresponde con el \emph{i}, es decir, son el mismo activo de la misma
+compañía. \\
+\midrule()
+\emph{M} & Es el vector con la capitalización de mercado de cada activo
+\emph{i.} \\
+\bottomrule()
+\caption{Descripción de variables para minimización de error utilizando teoría de Markowitz.}
+\end{longtable}
+
+La idea es que la métrica sea el error y las ganancias. En general la
+manera en que se miden esto y que se consigue este modelo es a través de
+heurísticas, pero el error sigue funcionando de forma usual, es decir,
+midiendo la desviación estándar de la diferencia de ganancia de los
+modelos y lo que se tiene en el período previo. Se intenta balancear
+esta varianza con las diferencias en los coeficientes de los portafolios
+de los modelos y el del clustering.
+
+La ecuación (7) es una que planteó Markowitz (1952) para hallar el riesgo mínimo dado unos ciertos rangos de ganancia. En este caso la ecuación es planteada con matrices dado que es una forma de plantear sistemas de ecuaciones con varias variables. Los rangos de ganacias estarían dados por la diferencia entre lo obtenido por los \emph{benchmark} y el valor del conjunto l de los activos que llevamos en el portafolio (aquello que queremos determinar). En cierta medida es como minizar el error para obtener un valor esperado. 
+
+La restricción (7.2) nos garantiza que se asignen apropiadamente los valores y no nos quedé un vector vacío o que el modelo de resultados falsos o no viables. La restricción (7.3) se base en que no se considerará las ventas inmediatas de activos. Durante el proceso se tendrá o no un cierto activo, no se tomará en cuenta el caso de venderlo.
+La restricción (7.4) es para tener una cota de ganancia máxima y estar obteniendo el riesgo mínimo acorde a esa cota. Esta restricción es necesaria cuando se trabaja en más de dos dimensiones puesto que el espacio de soluciones puede no ser acotado y entonces ningún modelo daría una solución óptima. La última restricción (7.5) es para tomar en cuenta los períodos de rebalanceo del portafolio y no realizar cambios que puedan presentar un problema a largo plazo.
+
+Una vez los resultados de los modelos sean obtenidos, entonces mediremos
+el error para analizar si en verdad la teoría y esta propuesta es apta
+para una economía como la mexicana. Para los \emph{benchmarks} la
+mediremos obteniendo la desviación estándar de la diferencia entre lo
+que el \emph{benchmark} y el portafolio de la clusterización hayan
+ganado.
+
+\textbf{Experimentación y análisis de resultados}
+
+Todo fue realizado en una laptop con sistema operativo Microsoft Windows
+11 Home Single Language, Versión 10.0.26100, de marca Acer y modelo
+Aspire AV15-53P, con un procesador de décima tercera generación Intel
+Core(TM) i5-1335U,1300 Mhz. Una memoria física instalada (RAM) de 16 GB,
+y un BIOS Insyde Corp V1.09.
+
+\textbf{Generación de instancias}
+
+El código fue realizado en un jupyter notebook de Python, de manera que cada casilla correspondía a una parte distinta del proceso. Primero se tuvo que elaborar el código que utilizando las librerías de “yfinance” e “invest-corepy” para poder extraer los datos diarios de las acciones de cada una de las 35 empresas del IPC listadas anteriormente. 
+
+La información de cada empresa era organizada en un dataframe con las columnas que indicaban la fecha, el precio de cierre de la acción, el precio máximo, el mínimo y la cantidad de acciones en circulación. Se ordenaban todas en ese preciso orden para posteriormente guardarse en un archivo CSV. 
+
+Después se volvían a leer los archivos y se iban guardando los datos en un mismo \emph{dataframe}, solo que organizando los nombres de cada columna de manera que indicaban qué dato eran y de cuál empresa. Cabe resaltar que todos los datos tenían las mismas fechas, por la que no había problemas al momento de ir concatenando los \emph{dataframes}. Además de esto se guardaban dos copias del \emph{dataframe}, excepto que una solo poseía las columnas que indicaban el precio de cierre.
+
+Es con este último es que se obtenían las correlaciones lineales entre los precios de todos y con dichos datos hacíamos el clustering haciendo uso del modelo (1), aprovechando el optimizador Gurobi (versión 12.0.0). Esto nos daba un archivo de texto el cual indicaba los activos representativos por clúster y a qué clúster eran asignados cada otro activo. Los activos representativos los escribía manualmente en una lista que se guardaría en memoria. También de forma manual se hacía una lista que guardaba la separación de cada semestre, el día en el que iniciaba uno y cuándo terminaba otro. Además de otra que hacía lo mismo para los datos del IPC, los cuales eran mensuales.
+
+También se indexaba la copia del \emph{dataframe} que no se había utilizado, con las fechas como índice, esto para la siguiente celda que se encargaba de conseguir los pesos que debía tener cada uno de los activos seleccionado a través del \emph{clustering}, durante cada semestre. De manera que se guardaba todo en una lista de listas, que poseía el peso de cada activo durante un semestre determinado. Se guardaba una lista de los pesos acorde a la capitalización de mercado, utilizando la ecuación (3) y otra con los de la volatilidad usando la (5).
+
+Cabe resaltar que se debía señalar de forma manual la cantidad de clústeres, para que el programa pudiese determinase los pesos. No era necesario especificar las empresas, pero sí la cantidad de clústeres. Ya después de esto se calculaba el error en otra celda. Pero primero hay que destacar que para el \emph{benchmark equally weighted} (2), no era necesario realizar un cálculo más que obtener el inverso multiplicativo del total de activos, que en este caso se trataba de la cantidad de clústeres. 
+
+La última celda era calcular el error con la desviación estándar de la diferencia del valor del portafolio al término del semestre con los pesos que determinaban los \emph{benchmark}, con el valor del IPC. También se midió el error tomando cambiando el valor explicito del IPC, por el de la suma de las capitalizaciones de mercado de todas las empresas que conforman el índice, es decir, una medición proporcional del IPC. Al final se consideró esta última ya que no se había considerado el cambio de empresas en la composición y métricas del índice, por lo que esta medida era mucho más congruente con el trabajo que habíamos realizado.
+
+Además del cálculo, los resultados eran guardados en un CSV que después manualmente se convirtió en un archivo de Excel, para poder analizar los resultados detenidamente y poder realizar gráficas de manera más cómoda. 
+
+\textbf{Resultados}
+
+Las siguientes tablas representan los resultados obtenidos por el clustering, cada tabla es el resultado de una selección distinta de centroides. Recordemos que decidimos tomar 2,4 y 8 centroides.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4973}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5027}}@{}}
+\toprule()
+\multicolumn{2}{@{}>{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{1.0000} + 2\tabcolsep}@{}}{%
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Empresas representativas para 2 clústeres}
+\end{minipage}} \\
+\midrule()
+\endhead
+\textbf{Grupo Financiero Banorte O.} & \textbf{Grupo Televisa S.A.B. CPO} \\
+America Movil S.A.B. de C.V. B & Alfa S.A. A. \\
+Arca Continental S.A.B. de C.V. &  Becle S.A. De C.V. \\
+Grupo Bimbo S.A.B. & Bolsa Mexicana de Valores S.A. de C.V. \\
+Cemex S.A. CPO & Industrias Peñoles \\
+Banco del Bajio S.A. & Megacable Holdings S.A.B. de C.V.\\
+Alsea S.A. & Orbia Advance Corporation S.A.B. de C.V. \\
+Coca Cola Femsa S.A.B de C.V. UBL  & \\
+Corporacion Inmobiliaria Vesta S.A.B. de C.V. &  \\
+El Puerto de Liverpool S.A.B. de C.V. &  \\
+Fomento Economico Mexicano S.A.B. de C.V. &  \\
+Grupo Carso S.A.B. de C.V. & \\
+Genomma Lab Internacional S.A. de C.V. &  \\
+Gentera S.A.B. de C.V. & Gruma S.A.B. B \\
+Grupo Aeroportuario del Centro Norte S.A.B. de C.V. & \\
+Grupo Aeroportuario del Sureste S.A.B. de C.V. B & \\
+Grupo Cementos de Chihuahua S.A.B. de C.V. & \\
+Grupo Comercial Chedraui S.A. de C.V. & \\
+Grupo Mexico S.A.B. de C.V. B & \\
+Kimberly Clark de Mexico S.A.B. de C.V. A & \\
+La Comer S.A.B. de C.V. UBC & \\
+Qualitas Controladora S.A.B. de C.V. &  \\
+Regional S.A. de C.V. &  \\
+Walmart de Mexico S.A.B. de C.V. & \\
+\bottomrule()
+\caption{Asignación de los activos acorde a los 2 clústeres }
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2404}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2569}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2408}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2619}}@{}}
+\toprule()
+\multicolumn{4}{@{}>{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{1.0000} + 6\tabcolsep}@{}}{%
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Empresas representativas para 4 clústeres}
+\end{minipage}} \\
+\midrule()
+\endhead
+\textbf{Bolsa Mexicana de Valores S.A. de C.V.} & \textbf{Genomma Lab Internacional S.A. de C.V.} &
+\textbf{Grupo Financiero Banorte O.} & \textbf{Grupo Televisa S.A.B. CPO }\\
+Becle S.A. De C.V. & & Grupo Bimbo S.A.B. & Alfa S.A. A.  \\
+Industrias Peñoles & & Cemex S.A. C.P.O. & Megacable Holdings S.A.B. de C.V.  \\
+La Comer S.A.B de C.V.UBC & & Alsea S.A. & Orbia Advance Corporation S.A.B. de C.V.  \\
+& & America Movil S.A.B. de C.V. B & \\
+& & Arca Continental S.A.B. de C.V. & \\
+& & Banco del Bajio S.A. & \\
+& & Coca Cola Femsa S.A.B de C.V. UBL & \\
+& & Corporacion Inmobiliaria Vesta S.A.B. de C.V. & \\
+& & El Puerto de Liverpool S.A.B. de C.V. & Gruma S.A.B. B \\
+& & Fomento Economico Mexicano S.A.B. de C.V.  & \\
+& &  Gentera S.A.B. de C.V.  & \\
+& & Gruma S.A.B. B & Grupo Comercial Chedraui S.A. de C.V. \\
+& & Grupo Aeroportuario del Centro Norte S.A.B. de C.V.  & \\
+& & Grupo Aeroportuario del Sureste S.A.B. de C.V. B  & \\
+& & Grupo Carso S.A.B. de C.V. & \\
+& & Grupo Cementos de Chihuahua S.A.B. de C.V. & \\
+& & Grupo Cementos de Chihuahua S.A.B. de C.V. & \\
+& & Grupo Financiero Inbursa O. & \\
+& & Grupo Mexico S.A.B. de C.V. B. & \\
+& & Kimberly Clark de Mexico S.A.B. de C.V. A & \\
+& & Qualitas Controladora S.A.B. de C.V. & \\
+& & Regional S.A. de C.V. & \\
+& & Walmart de Mexico S.A.B. de C.V. & \\
+\bottomrule()
+\caption{Asignación de los activos acorde a los 4 clústeres }
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0794}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1059}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1312}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1439}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1495}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1289}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1495}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1117}}@{}}
+\toprule()
+\multicolumn{8}{@{}>{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{1.0000} + 14\tabcolsep}@{}}{%
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Empresas representativas para 8 clústeres}
+\end{minipage}} \\
+\midrule()
+\endhead
+\textbf{Alfa S.A. A.} & \textbf{America Movil S.A.B. de C.V. B} &
+\textbf{Arca Continental S.A.B. de C.V.} & \textbf{Bolsa Mexicana de Valores S.A. de C.V.} & \textbf{Genomma Lab Internacional S.A. de C.V.} &
+\textbf{Grupo Carso S.A.B. de C.V. } & \textbf{Grupo Mexico S.A.B. de C.V. B} & \textbf{Grupo Televisa S.A.B. CPO} \\
+& Walmart de Mexico S.A.B. de C.V. & Grupo Bimbo S.A.B & Becle S.A. De C.V. &  & Corporacion Inmobiliaria Vesta S.A.B. de C.V. & Cemex S.A. CPO & Megacable Holdings S.A.B. de C.V. \\
+& & Banco del Bajio S.A. & Industrias Peñoles &  & Fomento Economico Mexicano S.A.B. de C.V. & Grupo Cementos de Chihuahua S.A.B. de C.V. & Orbia Advance Corporation S.A.B. de C.V. \\
+& & Coca Cola Femsa S.A.B de C.V. UBL &  &  & Gentera S.A.B. de C.V. & El Puerto de Liverpool S.A.B. de C.V. & \\
+& & Grupo Aeroportuario del Centro Norte S.A.B. de C.V. &  &  & Kimberly Clark de Mexico S.A.B. de C.V. A &  La Comer S.A.B. de C.V. UBC & \\
+& & Grupo Aeroportuario del Sureste S.A.B. de C.V. B  & &  & Qualitas Controladora S.A.B. de C.V. & Gruma S.A.B. B & \\
+& & Grupo Comercial Chedraui S.A. de C.V.  & &  & Alsea S.A.& & \\
+& & Grupo Financiero Banorte O. & & & & & \\
+& & Grupo Financiero Inbursa O. & & & &  & \\
+& & Regional S.A. de C.V. & & & &  & \\
+\bottomrule()
+\caption{Asignación de los activos acorde a los 8 clústeres }
+\end{longtable}
+
+A primera vista lo que podemos notar de estás tres tablas es que no fueron clústeres con una distribución uniforme, pues en los tres casos hubo uno que notoriamente es conformado por más elementos que el resto y en el caso de 4 y 8 clústeres fue la misma empresa (La Comer S.A.B. de C.V. UBC) la que fue el centroide con más empresas asociadas a él. Cabe destacar que se trata de una empresa comercial y de manera peculiar, podemos observar que su clúster queda integrado por otras empresas comerciales, de servicios y enfocadas a producción.
+
+Esto a diferencia de, por ejemplo, los clústeres de Grupo Financiero Inbursa O. Los cuales están conformado mayormente por empresas financieras. Siendo un caso que comparte Grupo Financiero Banorte O. Es decir, tenemos que las financieras se agruparon con empresas de la misma índole o de rubros similares.
+
+También las tablas 3 y 4, muestras un clúster en el cual se encuentran varias de las empresas más importantes del país en sectores muy distintos. Pues tenemos a Grupo México S.A.B. cd C.V. B (infraestructura, minería y transporte), Grupo Bimbo S.A.B. (alimentos), Grupo Televisa S.A.B. CPO (telecomunicaciones y radiodifusión), Arca Continental S.A.B. de C.V. (bebidas no alcohólicas y alimentos), e Industrias Peñoles (minería, metalurgia, química). Incluso en la tabla 2 están dentro del mismo clúster. 
+
+Hay varias empresas que se mantienen juntas en las tablas, como Grupo Carso S.A.B de C.V. y Bolsa Mexicana de Valores S.A. de C.V. Donde la primera es tal vez la empresa privada más importante del país, especialmente por abarcar los rubros comercial, infraestructura, energía, industrial, construcción. Todos son sectores tales que se encuentra fuertemente vinculado con el gobierno y es muchas veces contratada para cubrir labores estatales. Por eso hace sentido que vaya junto la única empresa completamente nacional del ínidce, como es la Bolsa Mexicana de Valores S.A de C.V.
+
+Por último, cabe resaltar que hay tres clústeres en la tabla 3, los cuales no poseen elementos más que su centroide. Esto podría indicar que la cantidad de centroides debería de ser menor ya que pierde algo de sentido el realizar un clustering para que un clúster tenga 10 elementos y otros 3 solo posean su centroide. En especial siendo que la tabla 3 indica un clustering mejor distribuido. Aunque determinar la cantidad óptima de clústeres se sale de este trabajo
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=.5]{Entera/1.png}}
+\label{Figura 1}
+\caption{Errores semestrales utilizando la capitalización de mercado para determinar los pesos de los activos.}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=.5]{Entera/2.png}}
+\label{Figura 2}
+\caption{Errores semestrales utilizando la volatilidad para determinar los pesos de los activos.}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=.5]{Entera/3.png}}
+\label{Figura 3}
+\caption{Errores semestrales utilizando el \textit{benchmark equally weighted} para determinar los pesos de los activos.}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=.5]{Entera/4.png}}
+\label{Figura 4}
+\caption{Media de los errores cuando se utilizó la capitalización de mercado para determinar los persos de los activos.}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=.5]{Entera/5.png}}
+\label{Figura 5}
+\caption{Media de los errores cuando se utilizó la volatilidad para determinar los persos de los activos.}
+\end{figure}
+
+La hipótesis de que los \emph{benchmarks} y modelos planteados en trabajos mayormente estadounidenses, no servirían adecuadamente en una economía tan distinta como la mexicana, se vio reflejada en los resultados. Las cinco figuras anteriores nos denotan  esto y además de denotar otros hechos.
+
+Hay dos períodos con mucho más error que el resto, y estos serían el segundo semestre de 2018 y el primero de 2020. En el primero de estos períodos fue el de las elecciones y el cambio de gobierno. Muchos de los cambios de retórica y discursos del gobierno que llegaba al poder provocaron mucha incertidumbre durante dicho período (Bacaria Colom, 2018)\footnote{Bacaria Colom, Jordi (2018). \textit{La nueva presidencia de México: entre la incertidumbre y la esperanza}. Barcelona Center for international affairs.}. Cabe resaltar que si bien durante 2024 también hubo un cambio de gobierno, este solo se presentó como una continuación, mientras que el anterior se vio como un rompimiento total con la alternancia bipartidista de las últimas décadas. Además, en 2024 fue un candidato con mucho más apoyo empresarial y mejor manejo de su discurso que su contraparte en 2018. 
+
+Y durante el primer semestre de 2020, fue el inicio de la pandemia del COVID-19. Etapa también llena de incertidumbre de los mercados e inicio de una recesión global, a causa de la pandemia. Entonces en los períodos donde hubo más error, ocurrieron eventos que nos podrían indicar a qué se deben estos picos en los semestres ya indicados (8 y 11).
+
+Por otro lado, también destacan los períodos, con poco error, es decir, los correspondientes al segundo semestre de 2020, y el segundo de 2021. Durante el primero, hubo una caída del PIB de alrededor 17.8\% (INEGI, 2020)\footnote{INEGI (2020). \textit{Economía y sectores productivos}. [Base de datos]} en el segundo trimestre.  Mientras que en el otro un crecimiento del 1.5\% (INEGI, 2021)\footnote{INEGI (2021). \textit{Economía y sectores productivos}. [Base de datos]} para el término del semestre.  Entonces ambos períodos presentan datos macroeconómicos muy distintos para poder relacionarlos. Lo único que les relaciona es que uno forma parte de las peores caídas tras la pandemia y el otro es el repunte económico cuando esta estaba concluyendo. 
+
+Dados los eventos ocurridos al menos a nivel nacional durante ese período y por lo anteriormente mencionado, no puedo realizar una conjetura apropiada que determine por qué esos períodos fueron notoriamente los de menor error. 
+
+La figura 4 es de interés ya que la culsterización que tuvo menor error, fue la realizada con 2 clústeres. Lo cual no es lo que estamos habituados a intuir, pues por lo general, partimos de la idea que entre más clústeres tengamos, más preciso será nuestro modelo, sin embargo, aquí fue el caso opuesto, a medida que se aumentaron los centroides, aumentó el error. Es también interesante que haya ocurrido utilizando la capitalización de mercado dado que es la manera en que se calcula el IPC.
+
+Tal vez por esto último es que no hayan sido óptimas las otras cantidades de centroides, pues al haber tomado pocos centroides, reducimos el sesgo que pudiese generar el tener una sobrerrepresentación. Podría ser que, bajo el propio criterio de la correlación lineal, y siendo consistente con el uso de la capitalización de mercado, que precisamente esto determinase una cierta robustez del modelo. Podemos decir entonces que la \emph{multilateral insurence} no funciona a partir de una cierta cantidad de clústeres o en un economía como la mexicna.
+
+Una indicación de que tener muchos clústeres, no es garantía de un buen rendimiento del modelo son los resultados en las figuras 4 y 5, pues este nunca es el que presenta menos error, ni se aproxima a este. En particular, cuando se discutió la tabla 10, se habló que había varios centroides sin elementos más que sí mismos, que, junto a los resultados obtenidos por esa métrica, podríamos determinar que la sobrerrepresentación termina por generar un sesgo, en lugar del esperado \emph{multilateral insurence} .
+
+El hecho de no haber agregado una figura para el valor medio presentado por el \textit{benchmark equally weighted} es que los pesos resultantes del \textit{benchmark} de la volatilidad fueron prácticamente idénticos a los otros. Tanto así, que se pueden apreciar las figuras 2 y 3, para notar que se trata prácticamente de la misma. En general no hay alguna diferencia más que en centesimales. Esto significa que los activos seleccionados a través del \textit{clustering} tenían prácticamente la misma volatilidad entre sí.
+
+Esto último podría ser un efecto de la concentración de sectores económicos enteros en pocas empresas, las cuales no son muy diversas. De esta forma, las acciones y activos de las empresas no estarían condicionadas a la competencia y la realidad del mercado nacional, sino que solo se verían afectados por aspectos macroeconómicos que influyen a todas las empresas al mismo tiempo y de maneras similares. 
+
+En general podríamos atribuir el error grande en todas las mediciones a que la manera en que fluctúa el mercado mexicano y sus empresas principales, a que varía mucho más que el de economías desarrolladas, y nuevamente, a que el IPC es medido con tan solo 35 empresas, mientras que los índices de economías desarrolladas son de cien o incluso más como pudieran ser el SP 500 o NASDAQ. Además de que sus índices presentan una mayor diversidad de sectores económicos, así como empresas muy diversificadas y donde una empresa usualmente no concentra la mayoría de una industria. No al menos de la forma en la que ocurre a nivel nacional.
+
+\textbf{Conclusiones}
+
+Le economía mexicana es una muy distinta a la de naciones desarrolladas, y con los resultados que obtuvimos podemos visualizar con mayor claridad cuáles son algunos de estos aspectos, como las prácticas con matices monopólicos o la carencia de una economía diversificada. En cierta medida muchos de estos aspectos pueden verse como áreas de oportunidad.
+
+Ciertamente queda mucho trabajo pendiente por realizar. Es de cierto interés el ver cómo haber implementado propiamente los modelos de Markowitz para haber optimizado los portafolios y reducido el riesgo, y ver qué tanto impacto tendría. Contrastar los datos ya optimizados con estos nos daría una mejor lectura.
+
+Aún así, el que sin haber optimizado, hayamos terminado con errores tan altos es un indicativo claro de que la teoría económica no sirve de manera igual para todos y que la teoría que se utilizó para este trabajo no es tan general como muchos lo quieren hacer ver. 
+
+Ciertamente el encontrar otras formas de medir el error y ver si existen otros acercamientos que nos brinden mejores resultados o se adapten más a nuestra realidad es también una pregunta que queda pendiente. Cabe destacar que dado los resultados atípicos que estaban teniendo, se intentaron realizar otras mediciones y procesos alternativos, pero por falta de conocimiento especializado en el ámbito económico, fueron descartados para mantener un cierto rigor. 
+
+También cabe agregar que, si bien se planteó que se querían probar los modelos durante la recesión de 2008, esto no se realizó al notar que no fue necesario someter al modelo a una situación de ese calibre, puesto que, con el período elegido, se presentaron por si mismos resultados bastante ilustrativos y claros para desestimar que esta clase de modelos y teorías no necesariamente aplica a contextos como el nacional. 
+
+
+\textbf{Referencias}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Gharanchaei, M. K., Panda, P. P. (2024). \emph{Constructing and
+  investment fund thourg stock clustering and integer programming}.
+  Journal of Advancements in Applied Business Research.
+\item
+  Markowitz, H. (1952). \emph{Portfolio selection}. JSTOR. (pp 77- 91).
+\item
+  Wolsey Laurence, A. (1998). Formulations. \emph{Integer Programming}.
+  (pp. 1-18). Wiley Interscience.
+\item
+  Bertsimas, D., Darnell, C., Soucy, R., (1998). \emph{Portfolio construction
+  through mixed integer programming}. MIT.
+\item
+  Kuhn, C. C. N., Calbert, G., Garanovich, I. L., Weir, T., (2023).
+  \emph{Integer linear programming supporting portfolio design.}
+  Elsevier.
+\item
+  Anderson, R. M., Bianachi, S. W., Goldberg, L. R. (2011). \emph{Will
+  My Risk Parity Strategy Outperform?} Berkeley.
+\item
+  Baker, M., Bradley, B., Wurgler, J\emph{. Benchmarks as Limits to
+  Arbitrage: Understanding the Low-Volatility Anomaly}. Financial
+  Analysts Journal.
+\item
+  Koumou, G. B. (2020). \emph{Diversification and portfolio theory: a
+  review}. Swiss Society for Financial Market Research.
+\item
+  Knutzen, S., Retterholt, J., (2015). \emph{Performance of risk-based
+  asset allocation strategies} {[}tesis master, Copenhagen Business
+  School{]}.
+\item
+  Choueifaty, Y., Coignard, Y. (2008). \emph{Toward Maximum
+  Diversification}. The Journal of Portfolio Management.
+\item
+  Reed, T; Muñoz Moreno, R. (febrero 23, 2023). \emph{How the Federal Economic
+  Competition Commission fights for workers and consumers in Mexico}.
+  World Bank.
+\item
+  Chow, T., Hsu, J., Kalesnik, V., Little, B. (2011). \emph{A Survey of
+  Alternative Equity Index Strategies.} Financial Analysts Journal.
+\item
+  Carvalho R. L., Lu, X., Moulin, P. (2012). \emph{Demystifying Equity
+  Risk-Based Strategies: A Simple Alpha plus Beta Description}. The
+  Journal of Portfolio Management.
+\item
+  Botyarov, M., Miller, E. E., \emph{Partitioning around medoids as a
+  systemic approach to generative design solution space reduction.}
+  Elsevier.
+\item
+  S\&P Dow Jones Indices. (febrero 2025\emph{). S\&P/BMV Indices:
+  Metodología}.
+\item
+  Banco de México. (2025). Sistema de Información Económica {[}Base de datos{]}.
+\item 
+Bacaria Colom, Jordi (2018). \textit{La nueva presidencia de México: entre la incertidumbre y la esperanza}. Barcelona Center for international affairs.
+\item 
+INEGI (2020). \textit{Economía y sectores productivos}. [Base de datos]
+\item 
+INEGI (2021). \textit{Economía y sectores productivos}. [Base de datos]
+\item
+  S\&P Dow Jones Indices. (31 marzo 2025). S\&P/BMV IPC: \emph{Constituents Export}. {[}Base de datos{]}.
+\item
+  Sánchez Deanny (octubre 6, 2023). Antitrust in Mexico: Perspectives,
+  challenges, and opportunities.
+\end{enumerate}
+
+\end{document}
