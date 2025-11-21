@@ -1013,13 +1013,17 @@ posteriormente guardarse en un archivo CSV.
 
 Después se volvían a leer los archivos y se iban guardando los datos en un mismo
 \emph{dataframe}, solo que organizando los nombres de cada columna de manera que
-indicaban qué dato eran y de cuál empresa. Cabe resaltar no que todos los datos tenían
+indicaban qué dato eran y de cuál empresa. Cabe resaltar que no todos los datos tenían
 las mismas fechas, por lo que fue necesario hacer un \emph{outer join} respecto de esta columna.
-Además de esto se guardaban dos copias del \emph{dataframe}, excepto
-que una solo poseía las columnas que indicaban el precio de cierre.
+Para poder manejar datos por intervalos semestrales, se tuvo que considerar ligeras variaciones, por
+ejemplo, el IPC manejaba intervalos con cierres el fin de mes (e.g. 31 Julio) mientras que los datos
+de las empresas consideraban el inicio del mes siguiente (e.g. 1 Agosto). Posteriormente se calculaba cada \emph{benchmark}, esto se hacía calculando la proporción con
+el método correspondiente y agrupando por semestre previamente definidos, esto para el IPC y las empresas
+por separado.
 
 Es con este último es que se obtenían las correlaciones lineales entre los precios
-de todos y con dichos datos hacíamos el clustering en el modelo (1a), aprovechando el optimizador Gurobi (versión 12.0.0). Esto nos daba un
+de todos y con dichos datos hacíamos el clustering en el modelo (1a), aprovechando 
+el optimizador Gurobi (versión 12.0.0). Esto nos daba un
 archivo de texto el cual indicaba los activos representativos por clúster y a qué
 clúster eran asignados cada otro activo. Los activos representativos los escribía
 manualmente en una lista por cluster que se guardaría en memoria. También de
@@ -1027,24 +1031,12 @@ forma manual se hacía una lista que guardaba la separación de cada semestre,
 cuándo iniciaba uno y cuándo terminaba otro. Además de otra que hacía lo mismo
 para los datos del IPC, los cuales eran mensuales.
 
-También se indexaba la copia del \emph{dataframe} que no se había utilizado, con las
-fechas como índice, esto para la siguiente celda que se encargaba de conseguir los
-pesos que debía tener cada uno de los activos seleccionado a través del \emph{clustering},
-durante cada semestre. De manera que se guardaba todo en una lista de listas, que
-poseía el peso de cada activo durante un semestre determinado. Se guardaba una
-lista de los pesos acorde a la capitalización de mercado, utilizando el \emph{benchmark}
-(3) y otra con los de la volatilidad usando el \emph{benchmark} (5).
-
 Cabe resaltar que se debía determinar manual la cantidad de clústeres, para que el
 programa determinase los pesos, no era necesario especificar las empresas, pero
 sí la cantidad de clústeres. Ya después de esto se calculó el error en otra
-celda. Pero primero hay que destacar que para el \emph{benchmark equally weighted} (2), no era necesario realizar un cálculo más que obtener el inverso multiplicativo
+celda. Pero primero hay que destacar que para el \emph{benchmark equally weighted} 
+(2), no era necesario realizar un cálculo más que obtener el inverso multiplicativo
 del total de activos, que en este caso se trataba de la cantidad de clústeres.
-
-Aquí falta realmente todo lo que me ayudaste a hacer y bueno, eso incluye
-correcciones a lo anterior. No corregí esta parte porque creo que es mejor con lo
-que viste tú que en realidad tienes la totalidad del código más fresca que yo, excepto
-la parte de jalar los datos, esa creo que se mantendría
 
 El modelo de Markowitz fue construido con ayuda de la librería de Gurobi y seguía
 al pie la expresión del modelo de Markowitz. Sin embargo, como el modelo solo
@@ -1083,6 +1075,41 @@ elaborar las gráficas comparando los diferentes portafolios entre sí. Estas gr
 además de las del tracking error total de cada una. Fue lo último que se realizó y
 estás fueron llamadas a través de funciones recursivas y guardadas de manera
 manual en una carpeta, para su posterior uso presentando los resultados.
+
+Para realizar las graficas, se consideraba dos tipos distintos de graficas. 
+Una respecto al tiempo, agrupado de nuevo por semestre considerando el valor de cierre
+para el IPC y las empresas y otra con el error acumulado y agrupado respecto al clúster, 
+\emph{benchmark} o ambos.
+
+Para calcular el error por semestre, primero se calculaba el returno de inversión, sumando
+el cambio en el semestre con la fecha de corte de la última fecha en este intervalo,
+respecto al cierre de la primera fecha (el cambio porcentual), esto del centroide del clúster,
+y múltiplicando por el peso que se dió al clúster. Esto se resume en la siguiente formula:
+
+\begin{equation}
+	r_{i,j} = \left(\frac{\text{Empresa}_{i+1,j}}{\text{Empresa}_{i,j}}-1\right)w_{i,j}
+\end{equation}
+
+\begin{longtable}[]{@{}
+>{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1601}}
+>{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8399}}@{}}
+\toprule()
+\center \(\text{Empresa}_{i,j}\) & Empresa centroide del semestre $i$, y del clúster $j$. \\
+\midrule
+\center \(w_{i,j}\) & Peso del \emph{benchmarks} al clúster $j$ en el semestre $i$.\\
+\midrule()
+\center \(r_{i,j}\) & Rendimiento en el semestre $i$ del clúster $j$. \\
+\bottomrule()
+\caption{Descripción de variables en la obtención del rendimiento de los portafolios de cada \emph{benchmark}.}
+\end{longtable}
+
+El proceso se repetía para el IPC, obteniendo así dos vectores de rendimiento,
+para cada \emph{benchmark}. Finalmente se calcula la grafica respecto al tiempo utilizando
+pandas y matplotlib para vizualizar estos datos por semestre utilizando la resta de los vectores,
+esto es, el cambio por semestre dado un \emph{benchmark}.
+
+Finalmente para la gráfica de error acumulado se utilizó la suma de estas diferencias a lo
+largo de todos los semestres, agrupando las diferencias respecto a la especificiación de la tabla.
 
 \textbf{Resultados}
 
